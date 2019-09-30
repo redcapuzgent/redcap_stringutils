@@ -8,73 +8,130 @@ use REDCap;
 
 class StringUtils extends \ExternalModules\AbstractExternalModule {
 
-    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@MD5", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@STRPOS"];
+    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@INDEXOF"];
+
+
     public function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance)
     {
-        $fieldValues = [];
-        $currentFields = [];
-        $values = $this->getData($project_id, $record);
-        foreach($values as $event => $eventVars)
-        {
-            foreach($eventVars as $eventVar)
-            {
-                $currentFields = array_merge($eventVar, $currentFields);
-            }
-        }
+        if ($record === null) return;
+        $listeners = [];
+        $warnings = [];
+        $fieldNames = $this->getFieldNames($project_id);
+
         foreach ($this->getMetadata($project_id) as $field) {
             $field_annotation = $field['field_annotation'];
             foreach (self::annotation as $annotation)
             {
                 if (strpos($field_annotation, $annotation) !== false) {
-                    $selectedPieces = explode("=", $field_annotation);
-                    $selectedField = explode(" ", $selectedPieces[1])[0];
-
-                    switch($annotation)
-                    {
-                            case "@TOLOWER":
-                                $fieldValues[$field["field_name"]] = mb_strtolower($currentFields[$selectedField]);
-                                break;
-                            case "@TOUPPER":
-                                $fieldValues[$field["field_name"]] = mb_strtoupper($currentFields[$selectedField]);
-                                break;
-                            case "@SUBSTR":
-                                break;
-                            case "@MD5":
-                                $fieldValues[$field["field_name"]] = md5($currentFields[$selectedField]);
-                                break;
-                            case "@LTRIM":
-                                $fieldValues[$field["field_name"]] = ltrim($currentFields[$selectedField]);
-                                break;
-                            case "@RTRIM":
-                                $fieldValues[$field["field_name"]] = rtrim($currentFields[$selectedField]);
-                                break;
-                            case "@TRIM":
-                                $fieldValues[$field["field_name"]] = trim($currentFields[$selectedField]);
-                                break;
-                            case "@STRLEN":
-                                $fieldValues[$field["field_name"]] = strlen($currentFields[$selectedField]);
-                                break;
-                            case "@STRPOS":
-                                break;
-                        default: break;
-
-                    }
-
+                    list($warnings, $listeners) = $this->getListenersFromAnot($field_annotation, $field, $annotation, $listeners, $warnings, $fieldNames);
                 }
             }
         }
-        echo '<script>';
-        foreach ($fieldValues as $fieldName => $fieldValue)
-        {
-            echo '$("input[name=\''.$fieldName.'\']").val("'.$fieldValue.'");';
-        }
-        echo '</script>';
+        $this->showWarnings($listeners, $fieldNames, $warnings);
+        $this->writeListeners($listeners);
 
     }
     public function redcap_survey_page($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance)
     {
             $this->redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance);
 
+    }
+
+    /**
+     * @param $project_id
+     * @param array $fieldNames
+     * @return array
+     */
+    public function getFieldNames($project_id)
+    {
+        $fieldNames = [];
+        foreach ($this->getMetadata($project_id) as $field) {
+            $fieldNames [] = $field["field_name"];
+        }
+        return $fieldNames;
+    }
+
+    /**
+     * @param array $listeners
+     * @param array $fieldNames
+     * @param array $warnings
+     */
+    public function showWarnings(array $listeners, array $fieldNames, array $warnings)
+    {
+        foreach ($listeners as $sourceField => $code) {
+            if (!in_array($sourceField, $fieldNames)) {
+                echo '<div class="alert">The following field is used by cannot be found: ' . $sourceField . '</div>';
+            }
+        }
+        foreach ($warnings as $warning) {
+            echo '<div class="alert">' . $warning . '</div>';
+        }
+    }
+
+    /**
+     * @param array $listeners
+     */
+    public function writeListeners(array $listeners)
+    {
+        echo '<script>';
+        foreach ($listeners as $sourceField => $code) {
+            echo '$("input[name=\'' . $sourceField . '\']").keyup(function(){';
+            echo $code;
+            echo '} );';
+        }
+        echo '</script>';
+    }
+
+    /**
+     * @param $field_annotation
+     * @param $field
+     * @param $annotation
+     * @param array $listeners
+     * @param array $warnings
+     * @param array $fieldNames
+     * @return array
+     */
+    public function getListenersFromAnot($field_annotation, $field, $annotation, array $listeners, array $warnings, array $fieldNames)
+    {
+        $selectedPieces = explode("=", $field_annotation);
+        $sourceField = explode(" ", $selectedPieces[1])[0];
+        $destinationField = $field["field_name"];
+        switch ($annotation) {
+            case "@TOLOWER":
+                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toLowerCase());';
+                break;
+            case "@TOUPPER":
+                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toUpperCase());';
+                break;
+            case "@LTRIM":
+                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimLeft());';
+                break;
+            case "@RTRIM":
+                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimRight());';
+                break;
+            case "@TRIM":
+                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trim());';
+                break;
+            case "@STRLEN":
+                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().length);';
+                break;
+            case "@SUBSTR":
+                $selectedFields = explode(",", $sourceField);
+                if (!is_numeric($selectedFields[1])) {
+                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[1] . ' is not numeric';
+                }
+                if (!is_numeric($selectedFields[2])) {
+                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[2] . ' is not numeric';
+                }
+                if (!in_array($selectedFields[0], $fieldNames)) {
+                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not fields.';
+                }
+                $listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $selectedFields[0] . '\']").val().substr(' . $selectedFields[1] . ', ' . $selectedFields[2] . '));';
+                break;
+            default:
+                break;
+        }
+        return [$warnings, $listeners];
     }
 
 }
