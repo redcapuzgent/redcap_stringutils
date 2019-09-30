@@ -59,18 +59,26 @@
                 </tr>
                 <tr>
                     <td>
-                        @MD5={sourcefieldnamehere}
+                        @STRLEN={sourcefieldnamehere}
                     </td>
                     <td>
-                        Converts the field in to its md5sum.
+                        Calculated the length of a field.
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        @CONCAT={sourcefieldnamehere1},{sourcefieldnamehere2}
+                        @TRIM={sourcefieldnamehere}
                     </td>
                     <td>
-                        Combines two fields.
+                        Trims the text of a field of whitespaces.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @LTRIM={sourcefieldnamehere}
+                    </td>
+                    <td>
+                        Trims the left side of text of a field of whitespaces.
                     </td>
                 </tr>
                 <tr>
@@ -79,15 +87,6 @@
                     </td>
                     <td>
                         Takes a part of a string from start to end. Start and end must be valid integers.
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        @STRPOS={haystackfieldnamehere},{needlefieldnamehere}
-                    </td>
-                    <td>
-                        Find the numeric position of the first occurrence of needle in the haystack string.
-                        Returns -1 if the needle is not found.
                     </td>
                 </tr>
                 </tbody>
