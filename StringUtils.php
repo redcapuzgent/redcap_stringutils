@@ -13,7 +13,6 @@ class StringUtils extends \ExternalModules\AbstractExternalModule {
 
     public function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance)
     {
-        if ($record === null) return;
         $listeners = [];
         $warnings = [];
         $fieldNames = $this->getFieldNames($project_id);
