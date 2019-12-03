@@ -8,7 +8,7 @@ use REDCap;
 
 class StringUtils extends \ExternalModules\AbstractExternalModule {
 
-    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@INDEXOF"];
+    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@INDEXOF", "@CONCAT"];
 
 
     public function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance)
@@ -58,7 +58,7 @@ class StringUtils extends \ExternalModules\AbstractExternalModule {
     public function showWarnings(array $listeners, array $fieldNames, array $warnings)
     {
         foreach ($listeners as $sourceField => $code) {
-            if (!in_array($sourceField, $fieldNames)) {
+            if (!in_array($sourceField, $fieldNames))  {
                 echo '<div class="alert">The following field is used by cannot be found: ' . $sourceField . '</div>';
             }
         }
@@ -123,9 +123,21 @@ class StringUtils extends \ExternalModules\AbstractExternalModule {
                     $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[2] . ' is not numeric';
                 }
                 if (!in_array($selectedFields[0], $fieldNames)) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not fields.';
+                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not a field.';
                 }
                 $listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $selectedFields[0] . '\']").val().substr(' . $selectedFields[1] . ', ' . $selectedFields[2] . '));';
+                break;
+            case "@CONCAT":
+                $sourceFieldsConcat = [];
+                $explodedSource = explode (",", $sourceField);
+                foreach($explodedSource as $explodedPiece)
+                    {
+                        $sourceFieldsConcat []= "$(\"input[name='$explodedPiece']\").val()";
+                    }
+                foreach($explodedSource as $explodedPiece)
+                {
+                    $listeners[$explodedPiece] .= '$("input[name=\'' . $destinationField . '\']").val('.implode("+",$sourceFieldsConcat).');';
+                }
                 break;
             default:
                 break;
