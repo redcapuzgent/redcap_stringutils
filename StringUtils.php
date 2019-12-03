@@ -8,7 +8,7 @@ use REDCap;
 
 class StringUtils extends \ExternalModules\AbstractExternalModule {
 
-    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@INDEXOF", "@CONCAT"];
+    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@INDEXOF", "@CONCAT", "@RIGHT"];
 
 
     public function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance)
@@ -126,6 +126,16 @@ class StringUtils extends \ExternalModules\AbstractExternalModule {
                     $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not a field.';
                 }
                 $listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $selectedFields[0] . '\']").val().substr(' . $selectedFields[1] . ', ' . $selectedFields[2] . '));';
+                break;
+            case "@RIGHT":
+                $selectedFields = explode(",", $sourceField);
+                if (!is_numeric($selectedFields[1])) {
+                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[1] . ' is not numeric';
+                }
+                if (!in_array($selectedFields[0], $fieldNames)) {
+                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not a field.';
+                }
+                $listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $selectedFields[0] . '\']").val().substr($("input[name=\'' . $selectedFields[0] . '\']").val().length - ' . $selectedFields[1] . ', $("input[name=\'' . $selectedFields[0] . '\']").val().length));';
                 break;
             case "@CONCAT":
                 $sourceFieldsConcat = [];
