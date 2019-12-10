@@ -5,6 +5,7 @@ namespace uzgent\StringUtils;
 // Declare your module class, which must extend AbstractExternalModule
 use REDCap;
 
+require_once "AnnotationParser.php";
 
 class StringUtils extends \ExternalModules\AbstractExternalModule {
 
@@ -22,7 +23,7 @@ class StringUtils extends \ExternalModules\AbstractExternalModule {
             foreach (self::annotation as $annotation)
             {
                 if (strpos($field_annotation, $annotation) !== false) {
-                    list($warnings, $listeners) = $this->getListenersFromAnot($field_annotation, $field, $annotation, $listeners, $warnings, $fieldNames);
+                    list($warnings, $listeners) = AnnotationParser::getListenersFromAnot($field_annotation, $field, $annotation, $listeners, $warnings, $fieldNames);
                 }
             }
         }
@@ -80,89 +81,4 @@ class StringUtils extends \ExternalModules\AbstractExternalModule {
         }
         echo '</script>';
     }
-
-    /**
-     * @param $field_annotation
-     * @param $field
-     * @param $annotation
-     * @param array $listeners
-     * @param array $warnings
-     * @param array $fieldNames
-     * @return array
-     */
-    public function getListenersFromAnot($field_annotation, $field, $annotation, array $listeners, array $warnings, array $fieldNames)
-    {
-        $selectedPieces = explode("=", $field_annotation);
-        $sourceField = explode(" ", $selectedPieces[1])[0];
-        $destinationField = $field["field_name"];
-        switch ($annotation) {
-            case "@TOLOWER":
-                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toLowerCase());';
-                break;
-            case "@TOUPPER":
-                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toUpperCase());';
-                break;
-            case "@LTRIM":
-                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimLeft());';
-                break;
-            case "@RTRIM":
-                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimRight());';
-                break;
-            case "@TRIM":
-                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trim());';
-                break;
-            case "@STRLEN":
-                $listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().length);';
-                break;
-            case "@SUBSTR":
-                $selectedFields = explode(",", $sourceField);
-                if (!is_numeric($selectedFields[1])) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[1] . ' is not numeric';
-                }
-                if (!is_numeric($selectedFields[2])) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[2] . ' is not numeric';
-                }
-                if (!in_array($selectedFields[0], $fieldNames)) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not a field.';
-                }
-                $listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $selectedFields[0] . '\']").val().substr(' . $selectedFields[1] . ', ' . $selectedFields[2] . '));';
-                break;
-            case "@RIGHT":
-                $selectedFields = explode(",", $sourceField);
-                if (!is_numeric($selectedFields[1])) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[1] . ' is not numeric';
-                }
-                if (!in_array($selectedFields[0], $fieldNames)) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not a field.';
-                }
-                $listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $selectedFields[0] . '\']").val().substr($("input[name=\'' . $selectedFields[0] . '\']").val().length - ' . $selectedFields[1] . ', $("input[name=\'' . $selectedFields[0] . '\']").val().length));';
-                break;
-            case "@LEFT":
-                $selectedFields = explode(",", $sourceField);
-                if (!is_numeric($selectedFields[1])) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[1] . ' is not numeric';
-                }
-                if (!in_array($selectedFields[0], $fieldNames)) {
-                    $warnings [] = 'For field: ' . $destinationField . ' ' . $selectedFields[0] . ' is not a field.';
-                }
-                $listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $selectedFields[0] . '\']").val().substr(0, '.$selectedFields[1].'));';
-                break;
-            case "@CONCAT":
-                $sourceFieldsConcat = [];
-                $explodedSource = explode (",", $sourceField);
-                foreach($explodedSource as $explodedPiece)
-                    {
-                        $sourceFieldsConcat []= "$(\"input[name='$explodedPiece']\").val()";
-                    }
-                foreach($explodedSource as $explodedPiece)
-                {
-                    $listeners[$explodedPiece] .= '$("input[name=\'' . $destinationField . '\']").val('.implode("+",$sourceFieldsConcat).');';
-                }
-                break;
-            default:
-                break;
-        }
-        return [$warnings, $listeners];
-    }
-
 }
