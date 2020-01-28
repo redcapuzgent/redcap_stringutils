@@ -60,7 +60,7 @@ class StringUtils extends \ExternalModules\AbstractExternalModule {
     {
         foreach ($listeners as $sourceField => $code) {
             if (!in_array($sourceField, $fieldNames))  {
-                echo '<div class="alert">The following field is used by cannot be found: ' . $sourceField . '</div>';
+                echo '<div class="alert">The following field is used but cannot be found: ' . $sourceField . '</div>';
             }
         }
         foreach ($warnings as $warning) {
