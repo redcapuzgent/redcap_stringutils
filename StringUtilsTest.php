@@ -56,3 +56,16 @@ assert(count($listeners) == 3);
 list($warnings, $listeners) = $stringUtils->getListenersFromAnot("@CONCAT=str1, str2, str3 @READONLY", ["field_name" => "sourceField"], "@CONCAT", [], [], ["str1", "str2", "str3"]);
 assert(count($warnings) == 0);
 assert(count($listeners) == 3);
+
+list($warnings, $listeners) = $stringUtils->getListenersFromAnot("@CONCAT=img_1,url,img_2 @READONLY", ["field_name" => "sourceField"], "@CONCAT", [], [], ["img_1", "url", "img_2"]);
+assert(count($warnings) == 0);
+assert(count($listeners) == 3);
+assert(array_key_exists("img_2", $listeners));
+
+
+list($warnings, $listeners) = $stringUtils->getListenersFromAnot("@CONCAT=img_1 , url , img_2 @READONLY", ["field_name" => "sourceField"], "@CONCAT", [], [], ["img_1", "url", "img_2"]);
+assert(count($warnings) == 0);
+assert(count($listeners) == 3);
+assert(array_key_exists("img_1", $listeners));
+assert(array_key_exists("url", $listeners));
+assert(array_key_exists("img_2", $listeners));
