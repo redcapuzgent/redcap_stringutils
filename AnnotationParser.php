@@ -103,6 +103,7 @@ class AnnotationParser
                 {
                     foreach($explodedSource as $explodedPiece)
                     {
+                        $explodedPiece = trim($explodedPiece);
                         @$listeners[$explodedPiece] .= '$("input[name=\'' . $destinationField . '\']").val('.implode("+",$sourceFieldsConcat).');';
                     }
                 }
