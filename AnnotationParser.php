@@ -27,22 +27,22 @@ class AnnotationParser
         $destinationField = $field["field_name"];
         switch ($annotation) {
             case "@TOLOWER":
-                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toLowerCase());';
+                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toLowerCase()).change();';
                 break;
             case "@TOUPPER":
-                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toUpperCase());';
+                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().toUpperCase()).change();';
                 break;
             case "@LTRIM":
-                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimLeft());';
+                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimLeft()).change();';
                 break;
             case "@RTRIM":
-                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimRight());';
+                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trimRight()).change();';
                 break;
             case "@TRIM":
-                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trim());';
+                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().trim()).change();';
                 break;
             case "@STRLEN":
-                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().length);';
+                @$listeners[$sourceField] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $sourceField . '\']").val().length).change();';
                 break;
             case "@SUBSTR":
                 $selectedFields = explode(",", $sourceField);
@@ -68,21 +68,21 @@ class AnnotationParser
                     }
                 }
                 if (!$badfield){
-                    @$listeners[$field0] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $field0 . '\']").val().substr(' . $field1 . ', ' . $field2. '));';
+                    @$listeners[$field0] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $field0 . '\']").val().substr(' . $field1 . ', ' . $field2. ')).change();';
                 }
                 break;
             case "@RIGHT":
                 $selectedFields = explode(",", $sourceField);
                 list($badfield, $warnings, $field0, $field1) = self::check2fields($warnings, $fieldNames, $selectedFields, $sourceField, $destinationField);
                 if (!$badfield){
-                    @$listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $field0 . '\']").val().substr($("input[name=\'' . $field0 . '\']").val().length - ' .$field1. ', $("input[name=\'' . $field0 . '\']").val().length));';
+                    @$listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $field0 . '\']").val().substr($("input[name=\'' . $field0 . '\']").val().length - ' .$field1. ', $("input[name=\'' . $field0 . '\']").val().length)).change();';
                 }
                 break;
             case "@LEFT":
                 $selectedFields = explode(",", $sourceField);
                 list($badfield, $warnings, $field0, $field1) = self::check2fields($warnings, $fieldNames, $selectedFields, $sourceField, $destinationField);
                 if (!$badfield) {
-                    @$listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $field0 . '\']").val().substr(0, '.$field1.'));';
+                    @$listeners[$selectedFields[0]] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $field0 . '\']").val().substr(0, '.$field1.')).change();';
                 }
                 break;
             case "@CONCAT":
@@ -104,7 +104,7 @@ class AnnotationParser
                     foreach($explodedSource as $explodedPiece)
                     {
                         $explodedPiece = trim($explodedPiece);
-                        @$listeners[$explodedPiece] .= '$("input[name=\'' . $destinationField . '\']").val('.implode("+",$sourceFieldsConcat).');';
+                        @$listeners[$explodedPiece] .= '$("input[name=\'' . $destinationField . '\']").val('.implode("+",$sourceFieldsConcat).').change();';
                     }
                 }
                 break;
