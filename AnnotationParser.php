@@ -108,6 +108,34 @@ class AnnotationParser
                     }
                 }
                 break;
+            case "@REPLACE":
+                $selectedFields = explode(",", $sourceField);
+                $badfield = false;
+                if (count($selectedFields) != 3) {
+                    $badfield = true;
+                    $warnings [] = 'REPLACE for '.$sourceField.' is badly formatted.';
+                } else {
+                    $field0 = trim($selectedFields[0]); // From
+                    $field1 = trim($selectedFields[1]); // What to replace
+                    $field2 = trim($selectedFields[2]); // replace with.
+                    if (!in_array($field0, $fieldNames)) {
+                        $warnings [] = 'For field: ' . $destinationField . ' ' . $field0 . ' is not a field.';
+                        $badfield  = true;
+                    }
+                    if (!in_array($field1, $fieldNames)) {
+                        $warnings [] = 'For field: ' . $destinationField . ' ' . $field1 . ' is not a field.';
+                        $badfield  = true;
+                    }
+                    if (!in_array($field2, $fieldNames)) {
+                        $warnings [] = 'For field: ' . $destinationField . ' ' . $field2 . ' is not a field.';
+                        $badfield  = true;
+                    }
+
+                }
+                if (!$badfield){
+                    @$listeners[$field0] .= '$("input[name=\'' . $destinationField . '\']").val($("input[name=\'' . $field0 . '\']").val().split($("input[name=\'' . $field1 . '\']").val()).join( $("input[name=\'' . $field2. '\']").val())).change();';
+                }
+                break;
             default:
                 break;
         }

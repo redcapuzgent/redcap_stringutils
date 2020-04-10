@@ -69,3 +69,7 @@ assert(count($listeners) == 3);
 assert(array_key_exists("img_1", $listeners));
 assert(array_key_exists("url", $listeners));
 assert(array_key_exists("img_2", $listeners));
+
+list($warnings, $listeners) = $stringUtils->getListenersFromAnot("@REPLACE=sourceField, searchvaluefield, newvaluefield", ["field_name" => "resultField"], "@REPLACE", [], [], ["resultField", "sourceField", "searchvaluefield", "newvaluefield"]);
+assert(count($warnings) == 0);
+assert(count($listeners) == 1);

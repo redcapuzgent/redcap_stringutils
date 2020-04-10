@@ -9,7 +9,7 @@ require_once "AnnotationParser.php";
 
 class StringUtils extends \ExternalModules\AbstractExternalModule {
 
-    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@INDEXOF", "@CONCAT", "@RIGHT", "@LEFT"];
+    const annotation = ["@TOLOWER", "@TOUPPER", "@SUBSTR", "@LTRIM", "@RTRIM", "@TRIM", "@STRLEN", "@INDEXOF", "@CONCAT", "@RIGHT", "@LEFT", "@REPLACE"];
 
 
     public function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance)
