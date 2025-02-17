@@ -1,23 +1,26 @@
 {
-  "name": "StringUtils",
-  "namespace": "uzgent\\StringUtils",
-  "description": "All kinds of stringutil functions",
-  "authors": [
-    {
-      "name": "Lieven Vaneeckhaute",
-      "email": "redcap@uzgent.be",
-      "institution": "University Hospital Ghent"
-    },
-    {
-      "name": "Simon Vanderschaeghe",
-      "email": "redcap@uzgent.be",
-      "institution": "University Hospital Ghent"
+    "name": "StringUtils",
+    "namespace": "uzgent\\StringUtils",
+    "description": "<b>This module has been deprecated since the introduction of special text functions in REDCap 10.5.0.</b><br>This module provides all kinds of stringutil functions.",
+    "authors": [
+        {
+            "name": "Lieven Vaneeckhaute",
+            "email": "redcap@uzgent.be",
+            "institution": "University Hospital Ghent"
+        },
+        {
+            "name": "Simon Vanderschaeghe",
+            "email": "redcap@uzgent.be",
+            "institution": "University Hospital Ghent"
+        }
+    ],
+    "documentation": "howto.html",
+    "permissions": [
+        "redcap_survey_page",
+        "redcap_data_entry_form"
+    ],
+    "framework-version": 10,
+    "compatibility": {
+        "redcap-max-version": "10.4.99"
     }
-  ],
-  "documentation" : "howto.html",
-  "permissions": [
-    "redcap_survey_page",
-    "redcap_data_entry_form"
-  ]
-
 }
