@@ -1,7 +1,7 @@
 {
     "name": "StringUtils",
     "namespace": "uzgent\\StringUtils",
-    "description": "<b>This module has been deprecated since the introduction of special text functions in REDCap 10.5.0.</b><br>This module provides all kinds of stringutil functions.",
+    "description": "<strong>This module has been deprecated since the introduction of special text functions in REDCap 10.5.0.</strong><br>This module provides all kinds of stringutil functions.",
     "authors": [
         {
             "name": "Lieven Vaneeckhaute",
@@ -15,11 +15,7 @@
         }
     ],
     "documentation": "howto.html",
-    "permissions": [
-        "redcap_survey_page",
-        "redcap_data_entry_form"
-    ],
-    "framework-version": 10,
+    "framework-version": 15,
     "compatibility": {
         "redcap-max-version": "10.4.99"
     }
